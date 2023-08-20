@@ -5,13 +5,44 @@
 Lets create a Kubernetes cluster to play with using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/)
 
 ```
-kind create cluster --name linkerd --image kindest/node:v1.19.1
+kind create cluster --name linkerd --image kindest/node:v1.27.0
 ```
 
 ## Deploy our microservices (Video catalog)
 
 ```
 # ingress controller
+https://www.youtube.com/watch?v=72zYxSxifpM&t=1179s&ab_channel=ThatDevOpsGuy
+
+```
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm search repo ingress-nginx --versions
+```
+Check the compatibility matrix: https://github.com/kubernetes/ingress-nginx/
+
+From the app version we select the version that matches the compatibility matrix. </br>
+
+```
+NAME                            CHART VERSION   APP VERSION     DESCRIPTION
+ingress-nginx/ingress-nginx     4.7.1           1.8.1           Ingress controller for Kubernetes using NGINX a...
+
+Now we can use `helm` to install the chart directly if we want. </br>
+Or we can use `helm` to grab the manifest and explore its content. </br>
+We can also add that manifest to our git repo if we are using a GitOps workflow to deploy it. </br>
+
+```
+CHART_VERSION="4.7.1"
+APP_VERSION="1.8.1"
+
+mkdir ./kubernetes/servicemesh/applications/ingress-nginx/manifests
+
+helm template ingress-nginx ingress-nginx \
+--repo https://kubernetes.github.io/ingress-nginx \
+--version ${CHART_VERSION} \
+--namespace ingress-nginx \
+> ./kubernetes/servicemesh/applications/ingress-nginx/manifests/nginx-ingress.${APP_VERSION}.yaml
+```
+
 kubectl create ns ingress-nginx
 kubectl apply -f kubernetes/servicemesh/applications/ingress-nginx/
 
@@ -23,16 +54,16 @@ kubectl apply -f kubernetes/servicemesh/applications/videos-api/
 kubectl apply -f kubernetes/servicemesh/applications/videos-db/
 ```
 
-## Make sure our applications are running 
+## Make sure our applications are running
 
 ```
 kubectl get pods
-NAME                            READY   STATUS    RESTARTS   AGE  
+NAME                            READY   STATUS    RESTARTS   AGE
 playlists-api-d7f64c9c6-rfhdg   1/1     Running   0          2m19s
 playlists-db-67d75dc7f4-p8wk5   1/1     Running   0          2m19s
 videos-api-7769dfc56b-fsqsr     1/1     Running   0          2m18s
 videos-db-74576d7c7d-5ljdh      1/1     Running   0          2m18s
-videos-web-598c76f8f-chhgm      1/1     Running   0          100s 
+videos-web-598c76f8f-chhgm      1/1     Running   0          100s
 
 ```
 
@@ -40,7 +71,7 @@ videos-web-598c76f8f-chhgm      1/1     Running   0          100s
 
 ```
 kubectl -n ingress-nginx get pods
-NAME                                        READY   STATUS    RESTARTS   AGE  
+NAME                                        READY   STATUS    RESTARTS   AGE
 nginx-ingress-controller-6fbb446cff-8fwxz   1/1     Running   0          2m38s
 nginx-ingress-controller-6fbb446cff-zbw7x   1/1     Running   0          2m38s
 
@@ -54,7 +85,7 @@ Let's fake one by adding the following entry in our hosts (`C:\Windows\System32\
 
 ```
 
-## Let's access our applications via Ingress 
+## Let's access our applications via Ingress
 
 ```
 kubectl -n ingress-nginx port-forward deploy/nginx-ingress-controller 80
@@ -101,7 +132,7 @@ I grabbed the `edge-20.10.1` release using `curl`
 You can go to the [releases](https://github.com/linkerd/linkerd2/releases/tag/edge-20.10.1) page to get it
 
 ```
-curl -L -o linkerd https://github.com/linkerd/linkerd2/releases/download/edge-20.10.1/linkerd2-cli-edge-20.10.1-linux-amd64 
+curl -L -o linkerd https://github.com/linkerd/linkerd2/releases/download/edge-20.10.1/linkerd2-cli-edge-20.10.1-linux-amd64
 chmod +x linkerd && mv ./linkerd /usr/local/bin/
 
 linkerd --help
@@ -169,11 +200,11 @@ This may only be temporary as your CI/CD system may roll out the previous YAML
 ```
 kubectl get deploy
 NAME            READY   UP-TO-DATE   AVAILABLE   AGE
-playlists-api   1/1     1            1           8h 
-playlists-db    1/1     1            1           8h 
-videos-api      1/1     1            1           8h 
-videos-db       1/1     1            1           8h 
-videos-web      1/1     1            1           8h 
+playlists-api   1/1     1            1           8h
+playlists-db    1/1     1            1           8h
+videos-api      1/1     1            1           8h
+videos-db       1/1     1            1           8h
+videos-web      1/1     1            1           8h
 
 kubectl get deploy playlists-api -o yaml | linkerd inject - | kubectl apply -f -
 kubectl get deploy playlists-db -o yaml | linkerd inject - | kubectl apply -f -
@@ -207,7 +238,7 @@ kubectl edit deploy videos-api
 #set environment FLAKY=true
 ```
 
-# Service Profile 
+# Service Profile
 
 ```
 linkerd profile -n default videos-api --tap deploy/videos-api --tap-duration 10s
@@ -228,11 +259,11 @@ linkerd top deploy/videos-api
 
 # Mutual TLS
 
-We can validate if mTLS is working 
+We can validate if mTLS is working
 
 ```
 /work # linkerd -n default edges deployment
-SRC                  DST             SRC_NS    DST_NS    SECURED       
+SRC                  DST             SRC_NS    DST_NS    SECURED
 playlists-api        videos-api      default   default   √
 linkerd-prometheus   playlists-api   linkerd   default   √
 linkerd-prometheus   playlists-db    linkerd   default   √

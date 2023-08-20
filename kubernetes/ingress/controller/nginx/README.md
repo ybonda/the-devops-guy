@@ -18,7 +18,7 @@ nginx-ingress-control-plane   Ready    control-plane,master   2m12s   v1.23.5
 
 ## Run a container to work in
 
-### run Alpine Linux: 
+### run Alpine Linux:
 ```
 docker run -it --rm -v ${HOME}:/root/ -v ${PWD}:/work -w /work --net host alpine sh
 ```
@@ -26,15 +26,15 @@ docker run -it --rm -v ${HOME}:/root/ -v ${PWD}:/work -w /work --net host alpine
 ### install some tools
 
 ```
-# install curl 
+# install curl
 apk add --no-cache curl
 
-# install kubectl 
+# install kubectl
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 mv ./kubectl /usr/local/bin/kubectl
 
-# install helm 
+# install helm
 
 curl -o /tmp/helm.tar.gz -LO https://get.helm.sh/helm-v3.10.1-linux-amd64.tar.gz
 tar -C /tmp/ -zxvf /tmp/helm.tar.gz
@@ -50,7 +50,7 @@ NAME                    STATUS   ROLES    AGE   VERSION
 nginx-ingress-control-plane   Ready    control-plane,master   3m26s   v1.23.5
 ```
 
-## NGINX Ingress Controller 
+## NGINX Ingress Controller
 
 We'll start with the documentation as always </br>
 You can find the [Kubernetes NGINX documentation here](https://kubernetes.github.io/ingress-nginx/) </br>
@@ -95,7 +95,7 @@ helm template ingress-nginx ingress-nginx \
 > ./kubernetes/ingress/controller/nginx/manifests/nginx-ingress.${APP_VERSION}.yaml
 ```
 
-### Deploy the Ingress controller 
+### Deploy the Ingress controller
 
 ```
 kubectl create namespace ingress-nginx
@@ -122,14 +122,14 @@ For testing purposes, we will simply setup `port-forward`ing </br>
 If you are running in the cloud, you will get a real IP address. </br>
 
 ```
-kubectl -n ingress-nginx port-forward svc/ingress-nginx-controller 443
+kubectl -n ingress-nginx port-forward svc/ingress-nginx-controller 8443:443
 ```
 
 We can reach our controller on [https://localhost/](https://localhost/) </br>
 
 It's important to understand that Ingress runs on two ports `80` and `443` </br>
 NGINX Ingress creates a fake certificate which is served for default `HTTPS` traffic on port `443`. </br>
-If you look in the browser you will notice the name of the certificate `Common Name (CN)	Kubernetes Ingress Controller Fake Certificate` 
+If you look in the browser you will notice the name of the certificate `Common Name (CN)	Kubernetes Ingress Controller Fake Certificate`
 
 ## Features
 
@@ -160,8 +160,8 @@ Our services accept traffic on:
 
 The most common way to route traffic with ingress is by domain:
 
-* https://public.service-a.com/ --> Ingress --> k8s service --> http://service-a/ 
-* https://public.service-b.com/ --> Ingress --> k8s service --> http://service-b/ 
+* https://public.service-a.com/ --> Ingress --> k8s service --> http://service-a/
+* https://public.service-b.com/ --> Ingress --> k8s service --> http://service-b/
 
 To showcase this, let's deploy an ingress for service-a and service-b that routes by domain. </br>
 
@@ -203,16 +203,16 @@ Now we can access service-a and service-b on:
 * https://public.service-b.com/
 
 
-### Routing by Path 
+### Routing by Path
 
 Another popular routing strategy is to use a shared domain and route based on the HTTP path. For example: </br>
 
-* https://public.my-services.com/path-a --> Ingress --> k8s service --> http://service-a/path-a 
+* https://public.my-services.com/path-a --> Ingress --> k8s service --> http://service-a/path-a
 * https://public.my-services.com/path-b --> Ingress --> k8s service --> http://service-b/path-b
 
 This way public path `/path-a` will hit our application on `/path-a` </br>
 
-Example Ingress: 
+Example Ingress:
 
 ```
 apiVersion: networking.k8s.io/v1
@@ -246,7 +246,7 @@ Now notice the following routing:
 * https://public.my-services.com/path-a --> Ingress --> k8s service --> http://service-a/
 * https://public.my-services.com/path-b --> Ingress --> k8s service --> http://service-b/
 
-No matter what path you place on the front end, as long as the path matches `/path-a` or `/path-b` 
+No matter what path you place on the front end, as long as the path matches `/path-a` or `/path-b`
 it will be routed to the correct service on `/` </br>
 It's important to note that no extra paths or querystrings will NOT be passed to the upstream </br>
 
@@ -264,7 +264,7 @@ To tell the Ingress controller that our application root path is `/home`, we can
 
 This means the controller will be aware that all traffic that matches `path-a` should go to `/home` on service-a. </br>
 
-### URL Rewrite 
+### URL Rewrite
 
 We saw earlier when we routed by path, that we could pass `/path-a` to service-a and `/path-b` to service-b. </br>
 However, the traffic would always go to `/` so we lost any trailing URL, parameters and querystring. </br>
@@ -329,7 +329,7 @@ As we noticed by logs, its default for the Ingress controller to offload SSL. </
 We can see this because when it routes to upstreams, it routes to our service on port 80 </br>
 Ingress offloads the TLS connection and creates a new connection with its upstream. </br>
 
-This is a common approach to offload TLS on the edge as internal traffic is generally unencrypted in private 
+This is a common approach to offload TLS on the edge as internal traffic is generally unencrypted in private
 networks especially in large microservice environments where security is tightened in other manners so TLS is not needed all the way through. </br>
 
 We can enable SSL pass through with the annotation: `nginx.ingress.kubernetes.io/ssl-passthrough`. </br>
@@ -348,7 +348,7 @@ This can be done with a [whitelist source range annotation](https://kubernetes.g
 You can set this globally if you want using the [Customization ConfigMap](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#whitelist-source-range). </br>
 We'll take a look at this customization in a bit. </br>
 
-### Authentication 
+### Authentication
 
 You can add a layer of protection to services exposed by ingress by several [Authentication methods](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#authentication). </br>
 
@@ -376,7 +376,7 @@ Deploy our ingresses:
 kubectl apply -f ./kubernetes/ingress/controller/nginx/features/basic-auth.yaml
 ```
 
-### Server snippet 
+### Server snippet
 
 Every ingress is technically an NGINX server block with a NGINX proxy pass. </br>
 We can even customise this server block with a [Server Snippet annotation](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#server-snippet)

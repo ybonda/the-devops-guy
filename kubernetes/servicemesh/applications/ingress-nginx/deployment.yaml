@@ -19,7 +19,14 @@ spec:
       serviceAccountName: nginx-ingress-serviceaccount
       containers:
         - name: nginx-ingress-controller
-          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.25.1
+          image: registry.k8s.io/ingress-nginx/controller:v1.8.1@sha256:e5c4824e7375fcf2a393e1c03c293b69759af37a9ca6abdb91b13d78a93da8bd
+          resources:
+            requests:
+              cpu: "100m" # 0.1 CPU core
+              memory: "128Mi" # 128 MiB
+            limits:
+              cpu: "500m" # 0.5 CPU cores
+              memory: "512Mi" # 512 MiB
           args:
             - /nginx-ingress-controller
             - --configmap=$(POD_NAMESPACE)/nginx-configuration
@@ -34,7 +41,7 @@ spec:
                 - ALL
               add:
                 - NET_BIND_SERVICE
-            runAsUser: 33
+            runAsUser: 101
           volumeMounts:
           - name: custom-snippets
             mountPath: /etc/nginx/custom-snippets/

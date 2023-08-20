@@ -20,11 +20,18 @@ spec:
         app: videos-web
     spec:
       containers:
-      - name: videos-web
-        image: aimvector/service-mesh:videos-web-1.0.0
-        imagePullPolicy : Always
-        ports:
-        - containerPort: 80
+        - name: videos-web
+          image: aimvector/service-mesh:videos-web-1.0.0
+          resources:
+            requests:
+              cpu: "100m" # 0.1 CPU core
+              memory: "128Mi" # 128 MiB
+            limits:
+              cpu: "500m" # 0.5 CPU cores
+              memory: "512Mi" # 512 MiB
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
@@ -42,7 +49,7 @@ spec:
       port: 80
       targetPort: 80
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -52,11 +59,13 @@ metadata:
   name: videos-web
 spec:
   rules:
-  - host: servicemesh.demo
-    http:
-      paths:
-      - path: /home(/|$)(.*)
-        backend:
-          serviceName: videos-web
-          servicePort: 80
-
+    - host: servicemesh.demo
+      http:
+        paths:
+          - path: /home(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: videos-web
+                port:
+                  number: 80

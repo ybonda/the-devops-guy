@@ -29,6 +29,13 @@ spec:
       containers:
       - name: videos-db
         image: redis:6.0-alpine
+        resources:
+            requests:
+              cpu: "100m" # 0.1 CPU core
+              memory: "128Mi" # 128 MiB
+            limits:
+              cpu: "500m" # 0.5 CPU cores
+              memory: "512Mi" # 512 MiB
         ports:
         - containerPort: 6379
         volumeMounts:
