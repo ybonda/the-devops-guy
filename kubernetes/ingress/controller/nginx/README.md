@@ -71,28 +71,35 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm search repo ingress-nginx --versions
 ```
 
+https://www.youtube.com/watch?v=72zYxSxifpM&t=1179s&ab_channel=ThatDevOpsGuy
+
+```
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm search repo ingress-nginx --versions
+```
+Check the compatibility matrix: https://github.com/kubernetes/ingress-nginx/
+
 From the app version we select the version that matches the compatibility matrix. </br>
 
 ```
 NAME                            CHART VERSION   APP VERSION     DESCRIPTION
-ingress-nginx/ingress-nginx     4.4.0           1.5.1           Ingress controller for Kubernetes using NGINX a...
+ingress-nginx/ingress-nginx     4.7.1           1.8.1           Ingress controller for Kubernetes using NGINX a...
 ```
-
 Now we can use `helm` to install the chart directly if we want. </br>
 Or we can use `helm` to grab the manifest and explore its content. </br>
 We can also add that manifest to our git repo if we are using a GitOps workflow to deploy it. </br>
 
 ```
-CHART_VERSION="4.4.0"
-APP_VERSION="1.5.1"
+CHART_VERSION="4.7.1"
+APP_VERSION="1.8.1"
 
-mkdir ./kubernetes/ingress/controller/nginx/manifests/
-
+mkdir ./kubernetes/servicemesh/applications/ingress-nginx/manifests
+```
 helm template ingress-nginx ingress-nginx \
 --repo https://kubernetes.github.io/ingress-nginx \
 --version ${CHART_VERSION} \
 --namespace ingress-nginx \
-> ./kubernetes/ingress/controller/nginx/manifests/nginx-ingress.${APP_VERSION}.yaml
+> ./kubernetes/servicemesh/applications/ingress-nginx/manifests/nginx-ingress.${APP_VERSION}.yaml
 ```
 
 ### Deploy the Ingress controller

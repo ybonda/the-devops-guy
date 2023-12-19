@@ -78,7 +78,7 @@ For the `playlists-api` to load all the video data, it needs to call `videos-api
 ## Traffic flow
 <hr/>
 <br/>
-A single `GET` request to the `playlists-api` will get all the playlists 
+A single `GET` request to the `playlists-api` will get all the playlists
 from its database with a single DB call <br/>
 
 For every playlist and every video in each list, a separate `GET` call will be made to the `videos-api` which will
@@ -155,11 +155,11 @@ docker-compose up
 
 ```
 
-You can access the app on `http://localhost` 
+You can access the app on `http://localhost`
 
 <br/>
 
-## Run the apps: Kubernetes 
+## Run the apps: Kubernetes
 <hr/>
 <br/>
 

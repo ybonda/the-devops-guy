@@ -12,41 +12,12 @@ kind create cluster --name linkerd --image kindest/node:v1.27.0
 
 ```
 # ingress controller
-https://www.youtube.com/watch?v=72zYxSxifpM&t=1179s&ab_channel=ThatDevOpsGuy
-
-```
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm search repo ingress-nginx --versions
-```
-Check the compatibility matrix: https://github.com/kubernetes/ingress-nginx/
-
-From the app version we select the version that matches the compatibility matrix. </br>
-
-```
-NAME                            CHART VERSION   APP VERSION     DESCRIPTION
-ingress-nginx/ingress-nginx     4.7.1           1.8.1           Ingress controller for Kubernetes using NGINX a...
-
-Now we can use `helm` to install the chart directly if we want. </br>
-Or we can use `helm` to grab the manifest and explore its content. </br>
-We can also add that manifest to our git repo if we are using a GitOps workflow to deploy it. </br>
-
-```
-CHART_VERSION="4.7.1"
-APP_VERSION="1.8.1"
-
-mkdir ./kubernetes/servicemesh/applications/ingress-nginx/manifests
-
-helm template ingress-nginx ingress-nginx \
---repo https://kubernetes.github.io/ingress-nginx \
---version ${CHART_VERSION} \
---namespace ingress-nginx \
-> ./kubernetes/servicemesh/applications/ingress-nginx/manifests/nginx-ingress.${APP_VERSION}.yaml
-```
 
 kubectl create ns ingress-nginx
 kubectl apply -f kubernetes/servicemesh/applications/ingress-nginx/
 
 # applications
+```
 kubectl apply -f kubernetes/servicemesh/applications/playlists-api/
 kubectl apply -f kubernetes/servicemesh/applications/playlists-db/
 kubectl apply -f kubernetes/servicemesh/applications/videos-web/
@@ -79,6 +50,8 @@ nginx-ingress-controller-6fbb446cff-zbw7x   1/1     Running   0          2m38s
 
 We'll need a fake DNS name `servicemesh.demo` <br/>
 Let's fake one by adding the following entry in our hosts (`C:\Windows\System32\drivers\etc\hosts`) file: <br/>
+
+On Mac: cd /private/etc/hosts
 
 ```
 127.0.0.1  servicemesh.demo
