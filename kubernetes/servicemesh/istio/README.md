@@ -5,7 +5,7 @@
 Lets create a Kubernetes cluster to play with using [kind](https://kind.sigs.k8s.io/docs/user/quick-start/)
 
 ```
-kind create cluster --name istio --image kindest/node:v1.19.1
+kind create cluster --name istio --image kindest/node:v1.30.0
 ```
 
 ## Deploy our microservices (Video catalog)
@@ -23,16 +23,16 @@ kubectl apply -f kubernetes/servicemesh/applications/videos-web/
 kubectl apply -f kubernetes/servicemesh/applications/videos-db/
 ```
 
-## Make sure our applications are running 
+## Make sure our applications are running
 
 ```
 kubectl get pods
-NAME                            READY   STATUS    RESTARTS   AGE  
+NAME                            READY   STATUS    RESTARTS   AGE
 playlists-api-d7f64c9c6-rfhdg   1/1     Running   0          2m19s
 playlists-db-67d75dc7f4-p8wk5   1/1     Running   0          2m19s
 videos-api-7769dfc56b-fsqsr     1/1     Running   0          2m18s
 videos-db-74576d7c7d-5ljdh      1/1     Running   0          2m18s
-videos-web-598c76f8f-chhgm      1/1     Running   0          100s 
+videos-web-598c76f8f-chhgm      1/1     Running   0          100s
 
 ```
 
@@ -40,7 +40,7 @@ videos-web-598c76f8f-chhgm      1/1     Running   0          100s
 
 ```
 kubectl -n ingress-nginx get pods
-NAME                                        READY   STATUS    RESTARTS   AGE  
+NAME                                        READY   STATUS    RESTARTS   AGE
 nginx-ingress-controller-6fbb446cff-8fwxz   1/1     Running   0          2m38s
 nginx-ingress-controller-6fbb446cff-zbw7x   1/1     Running   0          2m38s
 
@@ -54,7 +54,7 @@ Let's fake one by adding the following entry in our hosts (`C:\Windows\System32\
 
 ```
 
-## Let's access our applications via Ingress 
+## Let's access our applications via Ingress
 
 ```
 kubectl -n ingress-nginx port-forward deploy/nginx-ingress-controller 80
@@ -133,7 +133,7 @@ istioctl proxy-status
 
 There are 2 ways to mesh:
 
-1) Automated Injection: 
+1) Automated Injection:
 
 You can set the `istio-injection=enabled` label on a namespace to have the istio side car automatically injected into any pod that gets created in the labelled namespace
 
@@ -154,11 +154,11 @@ You may want to add this command to your CI/CD to keep only certain deployments 
 ```
 kubectl get deploy
 NAME            READY   UP-TO-DATE   AVAILABLE   AGE
-playlists-api   1/1     1            1           8h 
-playlists-db    1/1     1            1           8h 
-videos-api      1/1     1            1           8h 
-videos-db       1/1     1            1           8h 
-videos-web      1/1     1            1           8h 
+playlists-api   1/1     1            1           8h
+playlists-db    1/1     1            1           8h
+videos-api      1/1     1            1           8h
+videos-db       1/1     1            1           8h
+videos-web      1/1     1            1           8h
 
 # Lets manually inject istio sidecar into our Ingress Controller:
 
@@ -206,7 +206,7 @@ Access grafana dashboards :
 kubectl -n istio-system port-forward svc/grafana 3000
 ```
 
-## Kiali 
+## Kiali
 
 `NOTE: this may fail because CRDs need to generate, if so, just rerun the command:`
 
