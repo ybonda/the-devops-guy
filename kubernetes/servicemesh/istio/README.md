@@ -57,7 +57,7 @@ Let's fake one by adding the following entry in our hosts (`C:\Windows\System32\
 ## Let's access our applications via Ingress
 
 ```
-kubectl -n ingress-nginx port-forward deploy/nginx-ingress-controller 80
+sudo kubectl -n ingress-nginx port-forward deploy/nginx-ingress-controller 80
 ```
 
 ## Access our application in the browser
@@ -68,6 +68,8 @@ We should be able to access our site under `http://servicemesh.demo/home/`
 <hr/>
 
 # Getting Started with Istio
+
+https://www.youtube.com/watch?v=KUHzxTCe5Uc&t=245s&ab_channel=ThatDevOpsGuy
 
 Firstly, I like to do most of my work in containers so everything is reproducable <br/>
 and my machine remains clean.
@@ -181,8 +183,18 @@ Let's run a `curl` loop to generate some traffic to our site </br>
 We'll make a call to `/home/` and to simulate the browser making a call to get the playlists, <br/>
 we'll make a follow up call to `/api/playlists`
 
+For Windows:
 ```
 While ($true) { curl -UseBasicParsing http://servicemesh.demo/home/;curl -UseBasicParsing http://servicemesh.demo/api/playlists; Start-Sleep -Seconds 1;}
+```
+
+For Linux:
+```bash
+while true; do
+  curl http://servicemesh.demo/home/
+  curl http://servicemesh.demo/api/playlists
+  sleep 1
+done
 ```
 
 
